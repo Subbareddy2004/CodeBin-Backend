@@ -90,7 +90,6 @@ const startServer = async () => {
     } catch (error) {
       console.error('Unable to connect to the database:', error);
       console.error('Error stack:', error.stack);
-      console.error('Database URL:', process.env.DATABASE_URL); // Be careful not to log this in production
     }
   };
 
