@@ -68,9 +68,15 @@ app.get('/api/snippets/:id', async (req, res) => {
 });
 
 sequelize.sync().then(() => {
-  app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-  });
+  if (process.env.VERCEL) {
+    // Vercel deployment: Export the app as a module
+    module.exports = app;
+  } else {
+    // Local development: Start the server
+    app.listen(port, () => {
+      console.log(`Server running at http://localhost:${port}`);
+    });
+  }
 }).catch(err => {
   console.error('Unable to connect to the database:', err);
 });
