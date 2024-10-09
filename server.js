@@ -7,7 +7,6 @@ const sequelize = require('./config/database');
 const { DataTypes } = require('sequelize');
 
 const app = express();
-const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -50,7 +49,7 @@ app.post('/api/snippets', [
     res.status(201).json({ id: snippet.id });
   } catch (error) {
     console.error('Error creating snippet:', error);
-    res.status(500).json({ error: 'Error creating snippet' });
+    res.status(500).json({ error: 'Error creating snippet', details: error.message });
   }
 });
 
@@ -63,20 +62,34 @@ app.get('/api/snippets/:id', async (req, res) => {
     res.json(snippet);
   } catch (error) {
     console.error('Error fetching snippet:', error);
-    res.status(500).json({ error: 'Error fetching snippet' });
+    res.status(500).json({ error: 'Error fetching snippet', details: error.message });
   }
 });
 
-sequelize.sync().then(() => {
-  if (process.env.VERCEL) {
-    // Vercel deployment: Export the app as a module
-    module.exports = app;
-  } else {
-    // Local development: Start the server
-    app.listen(port, () => {
-      console.log(`Server running at http://localhost:${port}`);
-    });
-  }
-}).catch(err => {
-  console.error('Unable to connect to the database:', err);
+// Health check route
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK' });
 });
+
+const startServer = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('Database connection has been established successfully.');
+    await sequelize.sync();
+    console.log('All models were synchronized successfully.');
+
+    if (process.env.VERCEL) {
+      console.log('Running on Vercel, exporting app');
+      module.exports = app;
+    } else {
+      const port = process.env.PORT || 3000;
+      app.listen(port, () => {
+        console.log(`Server running at http://localhost:${port}`);
+      });
+    }
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+  }
+};
+
+startServer();
