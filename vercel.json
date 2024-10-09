@@ -15,5 +15,8 @@
         "src": "/health",
         "dest": "server.js"
       }
-    ]
+    ],
+    "env": {
+      "NODE_ENV": "production"
+    }
   }

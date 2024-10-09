@@ -72,24 +72,25 @@ app.get('/health', (req, res) => {
 });
 
 const startServer = async () => {
-  try {
-    await sequelize.authenticate();
-    console.log('Database connection has been established successfully.');
-    await sequelize.sync();
-    console.log('All models were synchronized successfully.');
+    try {
+      await sequelize.authenticate();
+      console.log('Database connection has been established successfully.');
+      await sequelize.sync();
+      console.log('All models were synchronized successfully.');
 
-    if (process.env.VERCEL) {
-      console.log('Running on Vercel, exporting app');
-      module.exports = app;
-    } else {
-      const port = process.env.PORT || 3000;
-      app.listen(port, () => {
-        console.log(`Server running at http://localhost:${port}`);
-      });
+      if (process.env.VERCEL) {
+        console.log('Running on Vercel, exporting app');
+        module.exports = app;
+      } else {
+        const port = process.env.PORT || 3000;
+        app.listen(port, () => {
+          console.log(`Server running at http://localhost:${port}`);
+        });
+      }
+    } catch (error) {
+      console.error('Unable to connect to the database:', error);
+      console.error('Error stack:', error.stack);
     }
-  } catch (error) {
-    console.error('Unable to connect to the database:', error);
-  }
-};
+  };
 
 startServer();
