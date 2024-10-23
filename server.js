@@ -9,11 +9,15 @@ const { DataTypes } = require('sequelize');
 const app = express();
 
 // Update CORS configuration
-app.use(cors({
-  origin: '*', // Allow all origins for now
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // Explicitly handle OPTIONS requests
 app.options('*', cors());
@@ -79,6 +83,10 @@ app.get('/api/snippets/:id', async (req, res) => {
 // Health check route
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK' });
+});
+
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'CORS is working' });
 });
 
 const startServer = async () => {
