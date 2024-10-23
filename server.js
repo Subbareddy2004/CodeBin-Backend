@@ -10,7 +10,7 @@ const app = express();
 
 // Update CORS configuration
 app.use(cors({
-  origin: ['https://codebin-seven.vercel.app', 'http://localhost:5173'],
+  origin: '*', // Allow all origins for now
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
