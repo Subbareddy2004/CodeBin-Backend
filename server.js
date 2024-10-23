@@ -6,6 +6,13 @@ const { body, validationResult } = require('express-validator');
 const connectDB = require('./config/database');
 const Snippet = require('./models/Snippet');
 
+// Add this near the top of the file, after the require statements
+console.log('Environment variables:', {
+  MONGODB_URI: process.env.MONGODB_URI ? '[REDACTED]' : 'undefined',
+  NODE_ENV: process.env.NODE_ENV,
+  // Add any other non-sensitive variables you want to check
+});
+
 const app = express();
 
 // Connect to MongoDB
