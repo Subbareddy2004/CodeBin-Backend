@@ -18,12 +18,16 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// Update CORS configuration
-app.use(cors({
+// CORS configuration
+const corsOptions = {
   origin: ['https://codebin-seven.vercel.app', 'http://localhost:5173'],
   methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
 
 // Explicitly handle OPTIONS requests
 app.options('*', cors());
@@ -37,11 +41,18 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path} - ${req.ip}`);
+  next();
+});
+
 app.post('/api/snippets', [
   body('title').trim().isLength({ min: 1, max: 100 }).escape(),
   body('code').trim().isLength({ min: 1, max: 10000 }),
   body('language').trim().isIn(['text', 'javascript', 'python', 'java', 'csharp', 'php']),
 ], async (req, res) => {
+  console.log('Received POST request to /api/snippets');
+  console.log('Request body:', req.body);
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
