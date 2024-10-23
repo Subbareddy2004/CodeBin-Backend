@@ -8,11 +8,15 @@ const { DataTypes } = require('sequelize');
 
 const app = express();
 
+// Update CORS configuration
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://codebin-seven.vercel.app'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  origin: ['https://codebin-seven.vercel.app', 'http://localhost:5173'],
+  methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Explicitly handle OPTIONS requests
+app.options('*', cors());
 
 // ... rest of your server code
 app.use(express.json());
@@ -78,27 +82,24 @@ app.get('/health', (req, res) => {
 });
 
 const startServer = async () => {
-    try {
-      await sequelize.authenticate();
-      console.log('Database connection has been established successfully.');
-      await sequelize.sync();
-      console.log('All models were synchronized successfully.');
+  try {
+    await sequelize.authenticate();
+    console.log('Database connection has been established successfully.');
+    await sequelize.sync();
+    console.log('All models were synchronized successfully.');
 
-      if (process.env.VERCEL) {
-        console.log('Running on Vercel, exporting app');
-        module.exports = app;
-      } else {
-        const port = process.env.PORT || 3000;
-        app.listen(port, () => {
-          console.log(`Server running at http://localhost:${port}`);
-        });
-      }
-    } catch (error) {
-      console.error('Unable to connect to the database:', error);
-      console.error('Error stack:', error.stack);
-    }
-  };
+    const port = process.env.PORT || 3000;
+    app.listen(port, () => {
+      console.log(`Server running at http://localhost:${port}`);
+    });
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+    console.error('Error stack:', error.stack);
+  }
+};
 
-startServer();
+if (process.env.NODE_ENV !== 'production') {
+  startServer();
+}
 
-module.exports=app;
+module.exports = app;
