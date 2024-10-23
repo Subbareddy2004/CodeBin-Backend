@@ -18,9 +18,6 @@
     "express-validator": "^7.2.0",
     "helmet": "^8.0.0",
     "mongodb": "^6.10.0",
-    "mongoose": "^8.7.2",
-    "pg": "^8.11.3",
-    "pg-hstore": "^2.3.4",
-    "sequelize": "^6.37.4"
+    "mongoose": "^8.7.2"
   }
 }
