@@ -13,6 +13,6 @@
       }
     ],
     "env": {
-      "DATABASE_URL": "@database_url"
+      "MONGODB_URI": "@mongodb_uri"
     }
 }

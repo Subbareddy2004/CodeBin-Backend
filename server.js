@@ -3,10 +3,13 @@ const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
-const sequelize = require('./config/database');
-const { DataTypes } = require('sequelize');
+const connectDB = require('./config/database');
+const Snippet = require('./models/Snippet');
 
 const app = express();
+
+// Connect to MongoDB
+connectDB();
 
 // Update CORS configuration
 app.use(cors({
@@ -18,7 +21,6 @@ app.use(cors({
 // Explicitly handle OPTIONS requests
 app.options('*', cors());
 
-// ... rest of your server code
 app.use(express.json());
 
 // Rate limiting
@@ -27,22 +29,6 @@ const limiter = rateLimit({
   max: 500
 });
 app.use(limiter);
-
-// Define Snippet model
-const Snippet = sequelize.define('Snippet', {
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  code: {
-    type: DataTypes.TEXT,
-    allowNull: false
-  },
-  language: {
-    type: DataTypes.STRING,
-    allowNull: false
-  }
-});
 
 app.post('/api/snippets', [
   body('title').trim().isLength({ min: 1, max: 100 }).escape(),
@@ -55,8 +41,9 @@ app.post('/api/snippets', [
   }
 
   try {
-    const snippet = await Snippet.create(req.body);
-    res.status(201).json({ id: snippet.id });
+    const snippet = new Snippet(req.body);
+    await snippet.save();
+    res.status(201).json({ id: snippet._id });
   } catch (error) {
     console.error('Error creating snippet:', error);
     res.status(500).json({ error: 'Error creating snippet', details: error.message });
@@ -65,7 +52,7 @@ app.post('/api/snippets', [
 
 app.get('/api/snippets/:id', async (req, res) => {
   try {
-    const snippet = await Snippet.findByPk(req.params.id);
+    const snippet = await Snippet.findById(req.params.id);
     if (!snippet) {
       return res.status(404).json({ error: 'Snippet not found' });
     }
@@ -90,25 +77,9 @@ app.use((err, req, res, next) => {
   res.status(500).send('Something broke!');
 });
 
-const startServer = async () => {
-  try {
-    await sequelize.authenticate();
-    console.log('Database connection has been established successfully.');
-    await sequelize.sync();
-    console.log('All models were synchronized successfully.');
-
-    const port = process.env.PORT || 3000;
-    app.listen(port, () => {
-      console.log(`Server running at http://localhost:${port}`);
-    });
-  } catch (error) {
-    console.error('Unable to connect to the database:', error);
-    console.error('Error stack:', error.stack);
-  }
-};
-
-if (process.env.NODE_ENV !== 'production') {
-  startServer();
-}
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+});
 
 module.exports = app;
