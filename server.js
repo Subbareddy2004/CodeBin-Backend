@@ -77,7 +77,7 @@ app.get('/api/snippets/:id', async (req, res) => {
     res.json(snippet);
   } catch (error) {
     console.error('Error fetching snippet:', error);
-    res.status(500).json({ error: 'Error fetching snippet' });
+    res.status(500).json({ error: 'Error fetching snippet', details: error.message });
   }
 });
 
