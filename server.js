@@ -9,15 +9,11 @@ const { DataTypes } = require('sequelize');
 const app = express();
 
 // Update CORS configuration
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-  next();
-});
+app.use(cors({
+  origin: ['https://codebin-seven.vercel.app', 'http://localhost:5173'],
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Explicitly handle OPTIONS requests
 app.options('*', cors());
@@ -87,6 +83,11 @@ app.get('/health', (req, res) => {
 
 app.get('/api/test', (req, res) => {
   res.json({ message: 'CORS is working' });
+});
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
 });
 
 const startServer = async () => {

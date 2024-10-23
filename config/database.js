@@ -8,7 +8,8 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
       require: true,
       rejectUnauthorized: false
     }
-  }
+  },
+  logging: false // Set to console.log to see the raw SQL queries
 });
 
 module.exports = sequelize;
