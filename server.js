@@ -20,7 +20,7 @@ connectDB();
 
 // CORS configuration
 const corsOptions = {
-  origin: ['https://codebin-seven.vercel.app', 'http://localhost:5173'],
+  origin: ['https://codebin-seven.vercel.app', 'https://bincodes.vercel.app' , 'http://localhost:5173'],
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
